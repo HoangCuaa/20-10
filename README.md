@@ -1,6 +1,6 @@
 # Nhật ký chúc mừng 20/10
 
-Một cuốn sách tương tác mừng Ngày Phụ nữ Việt Nam 20/10. Bốn trang đầu lần lượt mở bốn tấm ảnh có sẵn; ở trang cuối, người nhận chọn một trong bốn ảnh để mở lời chúc đặc biệt, được bao quanh bởi các tranh chibi. Chữ hiện dần, hoa nở, cánh hoa bay và hiệu ứng lấp lánh. Dự án dùng HTML, CSS và JavaScript thuần, không cần cài thư viện hay tải ảnh từ bên ngoài.
+Một cuốn sách tương tác mừng Ngày Phụ nữ Việt Nam 20/10. Bốn trang đầu lần lượt mở bốn tấm ảnh có sẵn; ở trang cuối, người nhận chọn một trong bốn ảnh để mở lời chúc đặc biệt, được bao quanh bởi các tranh chibi. Ảnh được lưu cục bộ dưới định dạng WebP đã tối ưu và được tải trước khi mở sách để lật trang nhanh hơn. Thiết bị cấu hình thấp hoặc bật tiết kiệm dữ liệu sẽ tự giảm mật độ hiệu ứng để trang chạy nhẹ hơn. Chữ hiện dần, hoa nở, cánh hoa bay và hiệu ứng lấp lánh. Dự án dùng HTML, CSS và JavaScript thuần, không cần cài thư viện hay tải ảnh từ bên ngoài.
 
 ## Xem thiệp
 

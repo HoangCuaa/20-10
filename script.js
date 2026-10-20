@@ -18,25 +18,25 @@ const CONFIG = {
 
 const PHOTO_PAGES = [
   {
-    src: 'assets/photo-1.png',
+    src: 'assets/photo-1.webp',
     alt: 'Ảnh chân dung bên hàng rào',
     caption: 'Một chút dịu dàng gửi đến bạn',
     note: 'Có những khoảnh khắc chỉ cần nhớ thôi cũng đủ mỉm cười.',
   },
   {
-    src: 'assets/photo-2.jpg',
+    src: 'assets/photo-2.webp',
     alt: 'Ảnh chân dung ngoài trời',
     caption: 'Nụ cười xinh trong một ngày đẹp trời',
     note: 'Mong mỗi ngày của bạn đều có một điều thật đáng yêu.',
   },
   {
-    src: 'assets/photo-3.png',
+    src: 'assets/photo-3.webp',
     alt: 'Ảnh đội chiếc mũ giấy',
     caption: 'Một kỷ niệm nhỏ thật đáng yêu',
     note: 'Dù là khoảnh khắc giản dị, vẫn luôn có cách khiến ta vui.',
   },
   {
-    src: 'assets/photo-4.jpg',
+    src: 'assets/photo-4.webp',
     alt: 'Ảnh chân dung với chiếc mũ giấy',
     caption: 'Trang cuối của những tấm hình thương mến',
     note: 'Chọn một tấm hình ở trang sau để mở lời nhắn dành riêng cho bạn.',
@@ -48,6 +48,12 @@ const $ = (s) => document.querySelector(s);
 const rand = (a, b) => Math.random() * (b - a) + a;
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const TAU = Math.PI * 2;
+const LOW_POWER_MODE = (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4)
+  || (navigator.deviceMemory > 0 && navigator.deviceMemory <= 4)
+  || Boolean(navigator.connection && navigator.connection.saveData);
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (LOW_POWER_MODE) document.documentElement.classList.add('low-performance');
 
 /* ---------- Hoa SVG ---------- */
 let uid = 0;
@@ -75,7 +81,7 @@ function flowerSVG({ hue = 340, sat = 88, light = 70, petals = 9, white = false 
     }
     // Quay chậm các lớp cánh (SMIL) để hoa "sống"
     const dir = i % 2 ? 360 : -360;
-    const anim = i < 4 ? `<animateTransform attributeName="transform" type="rotate" from="0 0 0" to="${dir} 0 0" dur="${50 + i * 25}s" repeatCount="indefinite"/>` : '';
+    const anim = !LOW_POWER_MODE && i < 4 ? `<animateTransform attributeName="transform" type="rotate" from="0 0 0" to="${dir} 0 0" dur="${50 + i * 25}s" repeatCount="indefinite"/>` : '';
     body += `<g>${ps}${anim}</g>`;
   });
   let dots = '';
@@ -126,7 +132,7 @@ const FLOWER_SET = [
 ];
 
 const flowersEl = $('#flowers');
-FLOWER_SET.forEach((f, i) => {
+(LOW_POWER_MODE ? FLOWER_SET.filter((_, i) => i % 2 === 0) : FLOWER_SET).forEach((f, i) => {
   f.delay = 0.15 + i * 0.09;
   const el = document.createElement('div');
   el.className = 'flower';
@@ -146,12 +152,23 @@ let currentPage = 1;
 let wishesUnlocked = false;
 let selectedPhoto = null;
 let pageTurning = false;
+const photoPreloads = new Map();
 
 function appendChibiArt(parent, variant, label) {
   const art = chibiTemplate.cloneNode(true);
   art.classList.add(`chibi--${variant}`);
   art.setAttribute('aria-label', label);
   parent.appendChild(art);
+}
+
+function preloadPhotoPages() {
+  PHOTO_PAGES.forEach(({ src }) => {
+    if (photoPreloads.has(src)) return;
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = src;
+    photoPreloads.set(src, image);
+  });
 }
 
 function renderWishReveal() {
@@ -296,13 +313,14 @@ function renderBookPage() {
 function turnBookPage(direction) {
   if (!opened || pageTurning || (direction > 0 && currentPage === 5) || (direction < 0 && currentPage === 1)) return;
 
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (REDUCED_MOTION) {
     currentPage += direction;
     renderBookPage();
     return;
   }
 
   pageTurning = true;
+  stopAnimationLoop();
   previousPageButton.disabled = true;
   nextPageButton.disabled = true;
 
@@ -310,6 +328,7 @@ function turnBookPage(direction) {
     pageTurning = false;
     previousPageButton.disabled = currentPage === 1;
     nextPageButton.disabled = currentPage === 5;
+    startAnimationLoop();
   };
 
   const updatePage = () => {
@@ -350,9 +369,12 @@ const cv = $('#fx');
 const ctx = cv.getContext('2d');
 let W = 0, H = 0, level = 1;
 const P = [];
+let frameId = 0;
+let lastFrameTime = 0;
+let lastDrawTime = 0;
 
 function resize() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, LOW_POWER_MODE ? 1 : 1.5);
   W = window.innerWidth;
   H = window.innerHeight;
   cv.width = W * dpr;
@@ -407,9 +429,11 @@ function mkTwinkle(x, y) {
 
 function burst(x, y, n = 30, speed = 1) {
   for (let i = 0; i < n; i++) P.push(mkBurst(x, y, speed));
-  if (P.length > 700) P.splice(0, P.length - 700);
+  const maxParticles = LOW_POWER_MODE ? 120 : 300;
+  if (P.length > maxParticles) P.splice(0, P.length - maxParticles);
 }
 function sparkle(x, y, n = 3) {
+  if (LOW_POWER_MODE) n = Math.min(n, 1);
   for (let i = 0; i < n; i++) {
     const p = mkBurst(x, y, 0.35);
     p.t = 'spark'; p.col = pick(['#ffffff', '#fff2a8']); p.s = rand(3, 7); p.max = p.life = rand(30, 60); p.g = 0.01;
@@ -418,7 +442,9 @@ function sparkle(x, y, n = 3) {
 }
 
 function ensureAmbient() {
-  const want = level === 2 ? { petal: 38, heart: 12 } : { petal: 14, heart: 4 };
+  const want = LOW_POWER_MODE
+    ? (level === 2 ? { petal: 10, heart: 3 } : { petal: 6, heart: 2 })
+    : (level === 2 ? { petal: 38, heart: 12 } : { petal: 14, heart: 4 });
   const have = { petal: 0, heart: 0 };
   P.forEach((p) => { if (p.amb) have[p.t]++; });
   const first = P.length === 0;
@@ -476,40 +502,71 @@ function draw(p) {
   ctx.restore();
 }
 
-function frame() {
+function frame(timestamp) {
+  frameId = 0;
+  if (document.hidden) return;
   if (pageTurning) {
-    requestAnimationFrame(frame);
+    lastFrameTime = timestamp;
+    startAnimationLoop();
     return;
   }
-
+  const frameInterval = LOW_POWER_MODE ? 1000 / 30 : 1000 / 45;
+  if (timestamp - lastDrawTime < frameInterval) {
+    startAnimationLoop();
+    return;
+  }
+  const step = lastFrameTime ? Math.min((timestamp - lastFrameTime) / (1000 / 60), 2) : 1;
+  lastFrameTime = timestamp;
+  lastDrawTime = timestamp;
   ctx.clearRect(0, 0, W, H);
 
   // lấp lánh ngẫu nhiên khắp màn hình
-  if (Math.random() < (opened ? 0.3 : 0.1)) P.push(mkTwinkle(rand(0, W), rand(0, H)));
+  const twinkleChance = LOW_POWER_MODE ? (opened ? 0.035 : 0.015) : (opened ? 0.12 : 0.04);
+  if (P.length < (LOW_POWER_MODE ? 180 : 450) && Math.random() < twinkleChance) {
+    P.push(mkTwinkle(rand(0, W), rand(0, H)));
+  }
 
   for (let i = P.length - 1; i >= 0; i--) {
     const p = P[i];
     if (p.amb) {
-      p.ph += 0.02;
-      p.x += p.vx + Math.sin(p.ph) * p.sw;
-      p.y += p.vy;
-      p.r += p.vr; p.fl += p.vf;
+      p.ph += 0.02 * step;
+      p.x += (p.vx + Math.sin(p.ph) * p.sw) * step;
+      p.y += p.vy * step;
+      p.r += p.vr * step; p.fl += p.vf * step;
       if (p.t === 'petal' && p.y > H + 30) { p.y = rand(-60, -10); p.x = rand(0, W); }
       if (p.t === 'heart' && p.y < -30) { p.y = H + rand(10, 80); p.x = rand(0, W); }
     } else {
-      p.life--;
+      p.life -= step;
       if (p.life <= 0) { P.splice(i, 1); continue; }
-      p.vx *= 0.985;
-      p.vy += p.g;
-      p.x += p.vx; p.y += p.vy;
-      p.r += p.vr; p.fl += p.vf;
+      p.vx *= 0.985 ** step;
+      p.vy += p.g * step;
+      p.x += p.vx * step; p.y += p.vy * step;
+      p.r += p.vr * step; p.fl += p.vf * step;
     }
     draw(p);
   }
-  requestAnimationFrame(frame);
+  startAnimationLoop();
 }
+
+function startAnimationLoop() {
+  if (!frameId && !document.hidden) frameId = requestAnimationFrame(frame);
+}
+
+function stopAnimationLoop() {
+  if (frameId) cancelAnimationFrame(frameId);
+  frameId = 0;
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopAnimationLoop();
+  else {
+    lastFrameTime = 0;
+    startAnimationLoop();
+  }
+});
+
 ensureAmbient();
-requestAnimationFrame(frame);
+startAnimationLoop();
 
 /* =====================================================
    HIỆN TIÊU ĐỀ + LỜI CHÚC TRẢI DẦN
@@ -616,17 +673,18 @@ let opened = false;
 function openCard(x, y) {
   if (opened) return;
   opened = true;
+  preloadPhotoPages();
   document.body.classList.add('opened');
   renderBookPage();
 
-  burst(x, y, 45);
-  setTimeout(() => burst(W / 2, H / 2, 80, 1.2), 250);
+  burst(x, y, LOW_POWER_MODE ? 12 : 30);
+  setTimeout(() => burst(W / 2, H / 2, LOW_POWER_MODE ? 18 : 50, 1.2), 250);
 
   // mỗi bông hoa nở kèm một chùm cánh hoa
-  FLOWER_SET.forEach((f) => {
+  (LOW_POWER_MODE ? [] : FLOWER_SET).forEach((f) => {
     const cx = Math.min(Math.max((f.x / 100) * W, 20), W - 20);
     const cy = Math.min(Math.max((f.y / 100) * H, 20), H - 20);
-    setTimeout(() => burst(cx, cy, 12, 0.8), f.delay * 1000 + 450);
+    setTimeout(() => burst(cx, cy, LOW_POWER_MODE ? 0 : 7, 0.8), f.delay * 1000 + 450);
   });
 
   level = 2;
@@ -635,8 +693,8 @@ function openCard(x, y) {
   // pháo cánh hoa ngẫu nhiên
   setInterval(() => {
     if (document.hidden) return;
-    burst(rand(W * 0.1, W * 0.9), rand(H * 0.1, H * 0.85), 16);
-  }, 2600);
+    burst(rand(W * 0.1, W * 0.9), rand(H * 0.1, H * 0.85), LOW_POWER_MODE ? 6 : 16);
+  }, LOW_POWER_MODE ? 5200 : 2600);
 }
 
 openCardButton.addEventListener('click', () => {
@@ -650,9 +708,4 @@ previousPageButton.addEventListener('click', () => {
 
 nextPageButton.addEventListener('click', () => {
   turnBookPage(1);
-});
-
-document.addEventListener('pointerdown', (e) => {
-  if (e.target.closest && e.target.closest('#replay, .photo-picker, #openCard, .gallery-photo, .page-turn, .collage-photo, .photo-choice')) return;
-  if (opened) burst(e.clientX, e.clientY, 24);
 });

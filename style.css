@@ -70,6 +70,11 @@ body {
   animation-duration: 24s
 }
 
+.low-performance .bg i {
+  filter: blur(48px);
+  animation: none;
+}
+
 .rays {
   position: absolute;
   left: 50%;
@@ -81,6 +86,11 @@ body {
   -webkit-mask-image: radial-gradient(circle closest-side, #000 0, transparent 58%);
   mask-image: radial-gradient(circle closest-side, #000 0, transparent 58%);
   animation: spinr 180s linear infinite;
+}
+
+.low-performance .rays {
+  animation: none;
+  opacity: .45;
 }
 
 @keyframes spinr {
@@ -110,7 +120,6 @@ body {
   translate: -50% -50%;
   transform: scale(0) rotate(-140deg);
   opacity: 0;
-  will-change: transform;
 }
 
 .opened .flower {
@@ -151,6 +160,14 @@ body {
   to {
     transform: rotate(2deg) translate(2px, 3px) scale(1.015)
   }
+}
+
+.low-performance .sway {
+  animation: none;
+}
+
+.low-performance .sway svg {
+  filter: none;
 }
 
 .stage {
