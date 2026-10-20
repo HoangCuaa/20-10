@@ -44,6 +44,7 @@ const PHOTO_PAGES = [
 ];
 
 /* ===================================================== */
+const BOOK_PAGE_COUNT = 6;
 const $ = (s) => document.querySelector(s);
 const rand = (a, b) => Math.random() * (b - a) + a;
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -57,7 +58,7 @@ if (LOW_POWER_MODE) document.documentElement.classList.add('low-performance');
 
 /* ---------- Hoa SVG ---------- */
 let uid = 0;
-function flowerSVG({ hue = 340, sat = 88, light = 70, petals = 9, white = false } = {}) {
+function flowerSVG({ hue = 340, sat = 74, light = 70, petals = 9, white = false } = {}) {
   const id = 'f' + uid++;
   const layers = [
     { n: petals, h: 96, w: 50, rot: 0, l: light + 12 },
@@ -106,29 +107,29 @@ document.querySelectorAll('[data-chibi]').forEach((slot) => {
 /* Hoa quanh viền: x,y (% màn hình), s (vmin), hue */
 const FLOWER_SET = [
   // góc trên trái
-  { x: 3, y: 4, s: 38, hue: 335, rot: -10, petals: 10 },
-  { x: 22, y: -3, s: 26, hue: 348, rot: 20, white: true, light: 88, petals: 9 },
-  { x: -3, y: 27, s: 28, hue: 342, rot: 35, petals: 9 },
+  { x: 2, y: 5, s: 20, hue: 335, rot: -10, petals: 10 },
+  { x: 18, y: -2, s: 12, hue: 348, rot: 20, white: true, light: 88, petals: 9 },
+  { x: -3, y: 27, s: 14, hue: 342, rot: 35, petals: 9 },
   // góc trên phải
-  { x: 97, y: 5, s: 40, hue: 340, rot: 15, petals: 10, white: true, light: 90 },
-  { x: 79, y: -2, s: 28, hue: 330, rot: -25, petals: 9 },
-  { x: 102, y: 28, s: 26, hue: 352, rot: 40, petals: 8 },
+  { x: 98, y: 5, s: 20, hue: 340, rot: 15, petals: 10, white: true, light: 90 },
+  { x: 82, y: -2, s: 12, hue: 330, rot: -25, petals: 9 },
+  { x: 103, y: 28, s: 14, hue: 352, rot: 40, petals: 8 },
   // góc dưới trái
-  { x: 4, y: 96, s: 40, hue: 338, rot: 10, petals: 10 },
-  { x: 24, y: 103, s: 28, hue: 345, rot: -30, petals: 9, white: true, light: 88 },
-  { x: -3, y: 72, s: 26, hue: 332, rot: 25, petals: 9 },
+  { x: 3, y: 96, s: 20, hue: 338, rot: 10, petals: 10 },
+  { x: 18, y: 103, s: 12, hue: 345, rot: -30, petals: 9, white: true, light: 88 },
+  { x: -3, y: 72, s: 14, hue: 332, rot: 25, petals: 9 },
   // góc dưới phải
-  { x: 96, y: 95, s: 38, hue: 335, rot: -15, petals: 10, white: true, light: 90 },
-  { x: 77, y: 102, s: 30, hue: 350, rot: 30, petals: 9 },
-  { x: 103, y: 70, s: 28, hue: 340, rot: -20, petals: 8 },
+  { x: 97, y: 95, s: 20, hue: 335, rot: -15, petals: 10, white: true, light: 90 },
+  { x: 82, y: 102, s: 12, hue: 350, rot: 30, petals: 9 },
+  { x: 103, y: 70, s: 14, hue: 340, rot: -20, petals: 8 },
   // giữa cạnh trên / dưới
-  { x: 50, y: -4, s: 20, hue: 342, rot: 0, petals: 8 },
-  { x: 50, y: 104, s: 20, hue: 346, rot: 15, petals: 8, white: true, light: 88 },
-  // hoa nhỏ rải thêm
-  { x: 9, y: 16, s: 13, hue: 345, rot: 10, petals: 7 },
-  { x: 91, y: 17, s: 13, hue: 335, rot: -10, petals: 7 },
-  { x: 8, y: 85, s: 13, hue: 340, rot: 20, petals: 7 },
-  { x: 92, y: 83, s: 13, hue: 350, rot: -20, petals: 7 },
+  { x: 50, y: -4, s: 9, hue: 342, rot: 0, petals: 8 },
+  { x: 50, y: 104, s: 9, hue: 346, rot: 15, petals: 8, white: true, light: 88 },
+  // điểm hoa nhỏ giữa các góc
+  { x: 9, y: 16, s: 8, hue: 345, rot: 10, petals: 7 },
+  { x: 91, y: 17, s: 8, hue: 335, rot: -10, petals: 7 },
+  { x: 8, y: 85, s: 8, hue: 340, rot: 20, petals: 7 },
+  { x: 92, y: 83, s: 8, hue: 350, rot: -20, petals: 7 },
 ];
 
 const flowersEl = $('#flowers');
@@ -151,6 +152,7 @@ const pageCounter = $('#pageCounter');
 let currentPage = 1;
 let wishesUnlocked = false;
 let selectedPhoto = null;
+let giftOpened = false;
 let pageTurning = false;
 const photoPreloads = new Map();
 
@@ -262,6 +264,59 @@ function renderPhotoChooser() {
   bookPageElement.appendChild(gate);
 }
 
+function renderGiftScene() {
+  const scene = document.createElement('section');
+  scene.className = 'gift-scene';
+  scene.classList.toggle('is-open', giftOpened);
+
+  const prompt = document.createElement('p');
+  prompt.className = 'gift-prompt';
+  prompt.textContent = 'Một món quà nhỏ, dành riêng cho bạn.';
+
+  const gift = document.createElement('button');
+  gift.className = 'gift-open-button';
+  gift.type = 'button';
+  gift.setAttribute('aria-label', giftOpened ? 'Hộp quà đã được mở' : 'Mở hộp quà');
+  gift.setAttribute('aria-expanded', String(giftOpened));
+  gift.classList.toggle('is-open', giftOpened);
+  gift.innerHTML = `
+    <span class="gift-art" aria-hidden="true">
+      <span class="gift-shadow"></span>
+      <span class="gift-box">
+        <span class="gift-ribbon"></span>
+        <span class="gift-lid">
+          <span class="gift-lid-ribbon"></span>
+          <span class="gift-bow gift-bow--left"></span>
+          <span class="gift-bow gift-bow--right"></span>
+          <span class="gift-bow-knot"></span>
+        </span>
+      </span>
+      <span class="gift-light"></span>
+    </span>
+    <span class="gift-action">${giftOpened ? 'MÓN QUÀ ĐÃ MỞ' : 'CHẠM ĐỂ MỞ QUÀ'}</span>
+  `;
+  gift.addEventListener('click', () => {
+    if (giftOpened) return;
+    giftOpened = true;
+    gift.classList.add('is-open');
+    gift.setAttribute('aria-expanded', 'true');
+    gift.setAttribute('aria-label', 'Hộp quà đã được mở');
+    gift.querySelector('.gift-action').textContent = 'MÓN QUÀ ĐÃ MỞ';
+    scene.classList.add('is-open');
+    message.textContent = 'RA CỔNG ĐỂ NHẬN QUÀ';
+    burst(W / 2, H * 0.47, LOW_POWER_MODE ? 18 : 42, 1.05);
+  });
+
+  const message = document.createElement('p');
+  message.className = 'gift-message';
+  message.setAttribute('role', 'status');
+  message.setAttribute('aria-live', 'polite');
+  if (giftOpened) message.textContent = 'RA CỔNG ĐỂ NHẬN QUÀ';
+
+  scene.append(prompt, gift, message);
+  bookPageElement.appendChild(scene);
+}
+
 function renderBookPage() {
   bookPageElement.className = 'book-page';
   bookPageElement.replaceChildren();
@@ -269,7 +324,9 @@ function renderBookPage() {
   const meta = document.createElement('p');
   meta.className = 'page-meta';
   const label = document.createElement('span');
-  label.textContent = currentPage === 5 ? 'CHỌN MỘT TẤM HÌNH' : 'NHẬT KÝ THƯƠNG MẾN';
+  label.textContent = currentPage === 5
+    ? (wishesUnlocked ? 'LỜI NHẮN DÀNH RIÊNG' : 'CHỌN MỘT TẤM HÌNH')
+    : currentPage === BOOK_PAGE_COUNT ? 'MÓN QUÀ CUỐI CÙNG' : 'NHẬT KÝ THƯƠNG MẾN';
   const number = document.createElement('span');
   number.textContent = `♡ 0${currentPage}`;
   meta.append(label, number);
@@ -277,7 +334,11 @@ function renderBookPage() {
 
   const heading = document.createElement('h1');
   heading.className = 'book-heading';
-  heading.textContent = currentPage < 5 ? PHOTO_PAGES[currentPage - 1].caption : 'Bốn tấm hình, một điều bí mật';
+  heading.textContent = currentPage < 5
+    ? PHOTO_PAGES[currentPage - 1].caption
+    : currentPage === 5
+      ? (wishesUnlocked ? 'Gửi bạn một lời chúc' : 'Bốn tấm hình, một điều bí mật')
+      : 'Một món quà nhỏ dành riêng cho bạn';
   bookPageElement.appendChild(heading);
 
   if (currentPage < 5) {
@@ -299,23 +360,32 @@ function renderBookPage() {
     note.className = 'book-handwritten';
     note.textContent = photo.note;
     bookPageElement.appendChild(note);
-  } else {
+  } else if (currentPage === 5) {
     if (wishesUnlocked) renderWishReveal();
     else renderPhotoChooser();
+  } else {
+    renderGiftScene();
   }
 
   pageCounter.dataset.page = String(currentPage);
-  pageCounter.textContent = `Trang ${currentPage} / 5`;
+  pageCounter.textContent = `Trang ${currentPage} / ${BOOK_PAGE_COUNT}`;
   previousPageButton.disabled = currentPage === 1 || pageTurning;
-  nextPageButton.disabled = currentPage === 5 || pageTurning;
+  nextPageButton.disabled = currentPage === BOOK_PAGE_COUNT
+    || (currentPage === 5 && !wishesUnlocked)
+    || pageTurning;
 }
 
 function turnBookPage(direction) {
-  if (!opened || pageTurning || (direction > 0 && currentPage === 5) || (direction < 0 && currentPage === 1)) return;
+  if (!opened || pageTurning
+    || (direction > 0 && (currentPage === BOOK_PAGE_COUNT || (currentPage === 5 && !wishesUnlocked)))
+    || (direction < 0 && currentPage === 1)) return;
+
+  clearTextTimers();
 
   if (REDUCED_MOTION) {
     currentPage += direction;
     renderBookPage();
+    if (currentPage === 5 && wishesUnlocked) playText();
     return;
   }
 
@@ -327,13 +397,15 @@ function turnBookPage(direction) {
   const finishTurn = () => {
     pageTurning = false;
     previousPageButton.disabled = currentPage === 1;
-    nextPageButton.disabled = currentPage === 5;
+    nextPageButton.disabled = currentPage === BOOK_PAGE_COUNT
+      || (currentPage === 5 && !wishesUnlocked);
     startAnimationLoop();
   };
 
   const updatePage = () => {
     currentPage += direction;
     renderBookPage();
+    if (currentPage === 5 && wishesUnlocked) playText();
   };
 
   if (document.startViewTransition) {
@@ -574,6 +646,11 @@ startAnimationLoop();
 let timers = [];
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 
+function clearTextTimers() {
+  timers.forEach(clearTimeout);
+  timers = [];
+}
+
 function centerOf(el) {
   const r = el.getBoundingClientRect();
   return [r.left + r.width / 2, r.top + r.height / 2];
@@ -597,8 +674,7 @@ function makeWords(text, parent, t0, wordDelay, sparkEvery) {
 }
 
 function playText() {
-  timers.forEach(clearTimeout);
-  timers = [];
+  clearTextTimers();
 
   const title = $('#title'), wishes = $('#wishes'), replay = $('#replay'), divider = $('#divider');
   title.innerHTML = '';

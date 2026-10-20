@@ -1,10 +1,10 @@
 # Nhật ký chúc mừng 20/10
 
-Một cuốn sách tương tác mừng Ngày Phụ nữ Việt Nam 20/10. Bốn trang đầu lần lượt mở bốn tấm ảnh có sẵn; ở trang cuối, người nhận chọn một trong bốn ảnh để mở lời chúc đặc biệt, được bao quanh bởi các tranh chibi. Ảnh được lưu cục bộ dưới định dạng WebP đã tối ưu và được tải trước khi mở sách để lật trang nhanh hơn. Thiết bị cấu hình thấp hoặc bật tiết kiệm dữ liệu sẽ tự giảm mật độ hiệu ứng để trang chạy nhẹ hơn. Chữ hiện dần, hoa nở, cánh hoa bay và hiệu ứng lấp lánh. Dự án dùng HTML, CSS và JavaScript thuần, không cần cài thư viện hay tải ảnh từ bên ngoài.
+Một cuốn sách tương tác mừng Ngày Phụ nữ Việt Nam 20/10. Bốn trang đầu lần lượt mở bốn tấm ảnh có sẵn; ở trang thứ năm, người nhận chọn một trong bốn ảnh để mở lời chúc đặc biệt. Trang cuối là hộp quà có thể chạm để mở, bên trong hiện lời nhắn “RA CỔNG ĐỂ NHẬN QUÀ”. Ảnh được lưu cục bộ dưới định dạng WebP và được tải trước khi mở sách. Thiết bị cấu hình thấp hoặc bật tiết kiệm dữ liệu sẽ tự giảm mật độ hiệu ứng; trang cũng tôn trọng cài đặt giảm chuyển động của thiết bị. Dự án dùng HTML, CSS và JavaScript thuần.
 
 ## Xem thiệp
 
-Mở `index.html` trực tiếp trong trình duyệt rồi chạm vào bìa. Lật lần lượt bốn trang ảnh, sau đó chọn một trong bốn tấm ở trang cuối để mở lời chúc. Các ảnh được lưu trong thư mục `assets/` và hiển thị ngay trên thiết bị; không có ảnh nào được tải lên máy chủ. Nếu muốn chạy qua máy chủ cục bộ, dùng một static file server bất kỳ, ví dụ:
+Mở `index.html` trực tiếp trong trình duyệt rồi chạm vào bìa. Lật bốn trang ảnh, chọn một tấm ở trang thứ năm để đọc lời chúc, rồi lật sang trang cuối và chạm hộp quà. Các ảnh được lưu trong thư mục `assets/` và hiển thị ngay trên thiết bị; không có ảnh nào được tải lên máy chủ. Nếu muốn chạy qua máy chủ cục bộ, dùng một static file server bất kỳ, ví dụ:
 
 ```sh
 python -m http.server 8000
