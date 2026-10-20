@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chúc mừng ngày Phụ nữ Việt Nam 20/10</title>
+  <meta name="description" content="Một tấm thiệp 20/10 dịu dàng gửi đến những người phụ nữ tuyệt vời. Chạm để mở và nhận lời chúc nhé!">
+  <meta name="theme-color" content="#f7f2e9">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Chúc mừng ngày Phụ nữ Việt Nam 20/10">
+  <meta property="og:description" content="Chúc bạn luôn tỏa sáng bằng vẻ đẹp và hạnh phúc của riêng mình.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Nền giấy mỹ thuật -->
+  <div class="bg" aria-hidden="true">
+    <div class="rays"></div>
+    <i></i><i></i><i></i>
+  </div>
+
+  <!-- Hoa viền (được sinh bằng script.js) -->
+  <div id="flowers" class="flowers" aria-hidden="true"></div>
+
+  <main class="stage">
+
+    <!-- Bìa nhật ký -->
+    <section class="intro" id="intro">
+      <p class="badge">MỘT MÓN QUÀ NHỎ DÀNH TẶNG BẠN</p>
+      <button class="intro-book" id="openCard" type="button" aria-label="Mở nhật ký chúc mừng ngày 20 tháng 10">
+        <span class="cover-frame" aria-hidden="true"></span>
+        <span class="cover-kicker">NHẬT KÝ THƯƠNG MẾN</span>
+        <span class="cover-date">20 <i>·</i> 10</span>
+        <span class="cover-art" data-chibi="rose" data-label="Chibi cô gái ôm một trái tim"></span>
+        <span class="cover-title">Gửi bạn,<br>người thật đặc biệt</span>
+        <span class="cover-footer">BẮT ĐẦU NHẬT KÝ <b>♡</b></span>
+      </button>
+      <p class="cover-hint">Chạm vào bìa để bắt đầu lật sách ♡</p>
+    </section>
+
+    <!-- Quyển sách ảnh -->
+    <section class="card" id="card" aria-label="Quyển sách ảnh chúc mừng ngày 20 tháng 10">
+      <article class="book-page" id="bookPage" aria-live="polite"></article>
+      <nav class="book-navigation" aria-label="Lật trang sách">
+        <button id="previousPage" class="page-turn" type="button" aria-label="Lật về trang trước" disabled>← Trang trước</button>
+        <span id="pageCounter" class="page-counter" aria-live="polite">Trang 1 / 5</span>
+        <button id="nextPage" class="page-turn" type="button">Trang sau →</button>
+      </nav>
+    </section>
+
+  </main>
+
+  <template id="chibiArt">
+    <svg class="chibi-art" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" role="img">
+      <ellipse class="chibi-hair" cx="60" cy="53" rx="34" ry="43"/>
+      <path class="chibi-hair" d="M30 47c-10-17-7-37 5-40l8 20m39-1 9-19c13 4 15 25 5 42l-7 20H34z"/>
+      <ellipse class="chibi-face" cx="60" cy="50" rx="25" ry="30"/>
+      <path class="chibi-fringe" d="M35 43c1-20 12-31 27-31 15 0 25 11 24 29-8-4-12-10-15-17-8 10-19 16-36 19z"/>
+      <ellipse cx="50" cy="52" rx="2.5" ry="3.8" fill="#493634"/>
+      <ellipse cx="70" cy="52" rx="2.5" ry="3.8" fill="#493634"/>
+      <circle cx="50.8" cy="50.8" r=".8" fill="#fff"/>
+      <circle cx="70.8" cy="50.8" r=".8" fill="#fff"/>
+      <path d="M56 62q4 4 8 0" fill="none" stroke="#b66a70" stroke-linecap="round" stroke-width="2"/>
+      <ellipse cx="43" cy="61" rx="5" ry="2.5" fill="#f29baa" opacity=".55"/>
+      <ellipse cx="77" cy="61" rx="5" ry="2.5" fill="#f29baa" opacity=".55"/>
+      <path class="chibi-skin" d="M41 83 34 92l5 5 11-8m29-6 9 8-5 6-11-8"/>
+      <path class="chibi-dress" d="m48 77 12-4 12 4 10 27H38z"/>
+      <path class="chibi-collar" d="m49 77 11 9 11-9-3-4-8 3-8-3z"/>
+      <path class="chibi-skin" d="m47 102-2 20h9l5-19m8-1 5 20h9l-3-22"/>
+      <path d="M41 122h13m18 0h13" stroke="#805a51" stroke-linecap="round" stroke-width="4"/>
+      <path class="chibi-heart" d="M60 101c-13-9-9-20 0-14 9-6 13 5 0 14z"/>
+      <path class="chibi-flower" d="M60 89c-3-5 2-7 4-3 4-3 7 1 3 4 2 5-3 7-5 3-4 3-7-1-3-4z" fill="#ffdc82"/>
+      <path class="chibi-wave-arm" d="M82 84c9-7 7-15 3-20l6-5c10 10 7 23-4 33z"/>
+      <path class="chibi-skin chibi-wave-arm" d="m85 62 2-9 4 1 1 9-3 3z"/>
+      <path d="m90 48 2-4m3 7 4-2m-9-5v-4" stroke="#d49a55" stroke-linecap="round" stroke-width="2"/>
+      <path d="m37 30-2-5m49 9 4-4" stroke="#fff5da" stroke-linecap="round" stroke-width="3"/>
+    </svg>
+  </template>
+
+  <!-- Canvas: cánh hoa, tim, lấp lánh -->
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
